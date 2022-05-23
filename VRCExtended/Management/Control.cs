@@ -22,7 +22,7 @@ internal static partial class Manager
 	{
 		Instance = instance;
 		Instance.ApplicationLateStart += CustomEvents.Init;
-		ClassInjector.RegisterTypeInIl2Cpp<Utils.EnableDisableListener>();
 		LoadModules();
+		ClassInjector.RegisterTypeInIl2Cpp<Utils.EnableDisableListener>();
 	}
 }

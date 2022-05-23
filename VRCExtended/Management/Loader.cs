@@ -84,7 +84,7 @@ internal static partial class Manager
             else
             {
                 if (!LoadFromCachedAppDomain(path, out assembly))
-                    continue;
+                    continue; // TODO: Add logging for failure.
                 
                 assemblyName = assembly.GetName();
                 entry = new ModuleEntry
@@ -243,7 +243,8 @@ internal static partial class Manager
         byte[] bytes = null;
         try
         { bytes = new WebClient().DownloadData(entry.Path); }
-        catch { /* ignored */ }
+        catch
+        { /* ignored */ }
         
         if (bytes == null) 
             return null;
@@ -252,7 +253,9 @@ internal static partial class Manager
         {
             var loadedAsm = Assembly.Load(bytes);
             
-            if (!Utilities.EnsureFolderExists(ModulesFolder)) return loadedAsm;
+            if (!Utilities.EnsureFolderExists(ModulesFolder)) 
+                return loadedAsm;
+            
             try
             { File.WriteAllBytes(Path.Combine(ModulesFolder, $"{loadedAsm.GetName().Name}.dll"), bytes); } 
             catch 
@@ -294,18 +297,13 @@ internal static partial class Manager
         if (module == null)
             return false;
     
-        try
-        {
-            IEnumerable<Type> types;
-            try { types = module.GetTypes(); }
-            catch (ReflectionTypeLoadException e) { types = e.Types.Where(t => t != null); }
-        
-            type = types.FirstOrDefault(t => t.IsSubclassOf(baseType));
-        }
-        catch
-        { return false; }
-
-        return true;
+        IEnumerable<Type> types;
+        try { types = module.GetTypes(); }
+        catch (ReflectionTypeLoadException e) { types = e.Types.Where(t => t != null); }
+        catch { return false; }
+    
+        type = types.FirstOrDefault(t => t.IsSubclassOf(baseType));
+        return type != null;
     }
     #endregion
 }
