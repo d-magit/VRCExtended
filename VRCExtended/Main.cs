@@ -10,6 +10,10 @@ using BuildInfo = VRCExtended.BuildInfo;
 [assembly: AssemblyCopyright($"Created by {BuildInfo.Author}")]
 [assembly: AssemblyVersion(BuildInfo.Version)]
 [assembly: AssemblyFileVersion(BuildInfo.Version)]
+[assembly: MelonInfo(typeof(VRCExtended.VRCExtended), BuildInfo.Name, BuildInfo.Version, BuildInfo.Author)]
+[assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonColor(BuildInfo.MelonColor)]
+[assembly: MelonPriority(int.MinValue)]
 
 namespace VRCExtended;
 
