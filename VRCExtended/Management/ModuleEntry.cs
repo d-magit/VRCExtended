@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using MelonLoader;
+using VRCExtended.Utils;
 
 namespace VRCExtended.Management;
 
@@ -17,16 +18,6 @@ public class ModuleEntry
     public string Path { get; set; }
     public Assembly Assembly { get; set; }
     public Version Version { get; set; }
-    public int Priority
-    {
-        get
-        {
-            int? result = null;
-            try
-            { result = Assembly.GetCustomAttribute<MelonPriorityAttribute>()?.Priority; }
-            catch
-            { /* ignored */ }
-            return result ?? 0;
-        }
-    }
+    public int Priority => 
+        Utilities.TryGetAssemblyAttribute<MelonPriorityAttribute>(Assembly, out var result) ? result.Priority : 0;
 }

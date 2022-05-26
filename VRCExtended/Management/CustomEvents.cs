@@ -12,7 +12,7 @@ internal static class CustomEvents
 {
     internal static void Init()
     {
-        Manager.Instance.HarmonyInstance.Patch(typeof(RoomManager)
+        VRCExtendedPlugin.Harmony.Patch(typeof(RoomManager)
                 .GetMethod(nameof(RoomManager.Method_Public_Static_Boolean_ApiWorld_ApiWorldInstance_String_Int32_0)),
             null, new HarmonyMethod(typeof(CustomEvents).GetMethod(nameof(OnInstanceChangeMethod), BindingFlags.NonPublic | BindingFlags.Static)));
         
@@ -25,7 +25,7 @@ internal static class CustomEvents
         MelonCoroutines.Start(OnUiManagerInitIEnum());
     }
     
-    private static void OnInstanceChangeMethod(ApiWorld __0, ApiWorldInstance __1) => Manager.Instance.OnInstanceChanged(__0, __1);
+    private static void OnInstanceChangeMethod(ApiWorld __0, ApiWorldInstance __1) => MelonModDetour.ModInstance.OnInstanceChanged(__0, __1);
 
     private static void OnUiManagerInit()
     {
@@ -33,7 +33,7 @@ internal static class CustomEvents
             field_Private_HashSet_1_UnityAction_1_T_0.Add(EventHandlerA);
         NetworkManager.field_Internal_Static_NetworkManager_0.field_Internal_VRCEventDelegate_1_Player_1.
             field_Private_HashSet_1_UnityAction_1_T_0.Add(EventHandlerB);
-        Manager.Instance.OnUiManagerInit();
+        MelonModDetour.ModInstance.OnUiManagerInit();
     }
 
     private static Action<Player> _eventHandlerA;
@@ -42,16 +42,16 @@ internal static class CustomEvents
     {
         get
         {
-            _eventHandlerB ??= Manager.Instance.OnPlayerLeft;
-            return _eventHandlerA ??= Manager.Instance.OnPlayerJoined;
+            _eventHandlerB ??= MelonModDetour.ModInstance.OnPlayerLeft;
+            return _eventHandlerA ??= MelonModDetour.ModInstance.OnPlayerJoined;
         }
     }
     private static Action<Player> EventHandlerB
     {
         get
         {
-            _eventHandlerA ??= Manager.Instance.OnPlayerLeft;
-            return _eventHandlerB ??= Manager.Instance.OnPlayerJoined;
+            _eventHandlerA ??= MelonModDetour.ModInstance.OnPlayerLeft;
+            return _eventHandlerB ??= MelonModDetour.ModInstance.OnPlayerJoined;
         }
     }
 }

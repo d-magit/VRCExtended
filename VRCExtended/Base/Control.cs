@@ -19,5 +19,5 @@ public abstract partial class VrcMod
 	}
 	
 	private void LogInternalError(Exception e, string methodName) => 
-		VRCExtended.Logger.Error($"Something went wrong in {GetType().Name} during {methodName} execution. Exception: {e}");
+		VRCExtendedPlugin.Logger.Error($"Something went wrong in {GetType().Name} during {methodName} execution. Exception: {e}");
 }

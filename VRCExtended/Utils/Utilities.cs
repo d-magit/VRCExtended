@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnhollowerBaseLib.Attributes;
-using UnhollowerRuntimeLib;
 using UnhollowerRuntimeLib.XrefScans;
 using UnityEngine;
 using VRC;
@@ -16,7 +15,8 @@ namespace VRCExtended.Utils;
 
 internal static class Utilities
 {
-    internal static string MainFolder = Path.Combine(Environment.CurrentDirectory, BuildInfo.Name);
+    internal static readonly string MainFolder = Path.Combine(Environment.CurrentDirectory, BuildInfo.Name);
+    internal static readonly string ModulesFolder = Path.Combine(MainFolder, "Modules");
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static VRCPlayer GetLocalVrcPlayer() => VRCPlayer.field_Internal_Static_VRCPlayer_0;
 
@@ -38,6 +38,18 @@ internal static class Utilities
             VRCSDK2.VRC_SceneDescriptor => WorldSDKVersion.SDK2,
             _ => WorldSDKVersion.None
         };
+    
+    internal static bool TryGetAssemblyAttribute<T>(Assembly assembly, out T result) where T : Attribute
+    {
+        result = null;
+        
+        try
+        { result = assembly.GetCustomAttribute<T>(); }
+        catch
+        { /* ignored */ }
+        
+        return result != null;
+    }
 
     public static Transform GetBoneTransform(Player player, HumanBodyBones bone)
     {
@@ -99,6 +111,8 @@ internal static class Utilities
 
 internal class EnableDisableListener : MonoBehaviour
 {
+    public EnableDisableListener(IntPtr obj0) : base(obj0) { }
+    
     [method: HideFromIl2Cpp]
     internal event Action OnEnabled;
 

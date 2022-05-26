@@ -1,6 +1,7 @@
 using System;
 using VRC;
 using VRC.Core;
+using VRCExtended.Management;
 
 namespace VRCExtended.Base;
 
@@ -27,28 +28,28 @@ public abstract partial class VrcMod : ICustomEvents
 	
 	private void RegisterCustomEvents()
 	{
-		if (IsOverriding(nameof(OnUiManagerInit))) Management.Manager.Instance.UiManagerInit += () =>
+		if (IsOverriding(nameof(OnUiManagerInit))) MelonModDetour.ModInstance.UiManagerInit += () =>
 		{
 			try
 			{ OnUiManagerInit(); }
 			catch (Exception e)
 			{ LogInternalError(e, nameof(OnUiManagerInit)); }
 		};
-		if (IsOverriding(nameof(OnPlayerJoined))) Management.Manager.Instance.PlayerJoined += player =>
+		if (IsOverriding(nameof(OnPlayerJoined))) MelonModDetour.ModInstance.PlayerJoined += player =>
 		{
 			try
 			{ OnPlayerJoined(player); }
 			catch (Exception e)
 			{ LogInternalError(e, nameof(OnPlayerJoined)); }
 		};
-		if (IsOverriding(nameof(OnPlayerLeft))) Management.Manager.Instance.PlayerLeft += player =>
+		if (IsOverriding(nameof(OnPlayerLeft))) MelonModDetour.ModInstance.PlayerLeft += player =>
 		{
 			try
 			{ OnPlayerLeft(player); }
 			catch (Exception e)
 			{ LogInternalError(e, nameof(OnPlayerLeft)); }
 		};
-		if (IsOverriding(nameof(OnInstanceChanged))) Management.Manager.Instance.InstanceChanged += (apiWorld, apiWorldInstance) =>
+		if (IsOverriding(nameof(OnInstanceChanged))) MelonModDetour.ModInstance.InstanceChanged += (apiWorld, apiWorldInstance) =>
 		{
 			try
 			{ OnInstanceChanged(apiWorld, apiWorldInstance); }

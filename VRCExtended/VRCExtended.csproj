@@ -6,17 +6,11 @@
 	<VrcReferences>true</VrcReferences>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cp $(OutputPath)$(AssemblyName).dll $(MelonManaged)\..\..\" />
+    <Exec Command="cp $(OutputPath)$(AssemblyName).dll $(MelonManaged)\..\..\Plugins" />
   </Target>
   <ItemGroup>
     <Compile Update="Config.cs">
       <DependentUpon>Settings.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Management\Loader.cs">
-      <DependentUpon>Control.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Management\ModuleEntry.cs">
-      <DependentUpon>Control.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

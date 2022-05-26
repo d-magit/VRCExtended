@@ -4,7 +4,8 @@ using VRC.Core;
 
 namespace VRCExtended;
 
-public partial class VRCExtended
+// ReSharper disable once InconsistentNaming
+public partial class VRCExtendedMod
 {
     #region Melon Events
     internal event Action PreSupportModule;

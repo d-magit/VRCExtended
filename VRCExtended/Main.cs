@@ -2,15 +2,18 @@
 using System;
 using System.Reflection;
 using MelonLoader;
+using UnhollowerRuntimeLib;
 using VRC;
 using VRC.Core;
+using VRCExtended.Management;
+using VRCExtended.Utils;
 
 using BuildInfo = VRCExtended.BuildInfo;
 [assembly: AssemblyTitle(BuildInfo.Name)]
 [assembly: AssemblyCopyright($"Created by {BuildInfo.Author}")]
 [assembly: AssemblyVersion(BuildInfo.Version)]
 [assembly: AssemblyFileVersion(BuildInfo.Version)]
-[assembly: MelonInfo(typeof(VRCExtended.VRCExtended), BuildInfo.Name, BuildInfo.Version, BuildInfo.Author)]
+[assembly: MelonInfo(typeof(VRCExtended.VRCExtendedPlugin), BuildInfo.Name, BuildInfo.Version, BuildInfo.Author)]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonColor(BuildInfo.MelonColor)]
 [assembly: MelonPriority(int.MinValue)]
@@ -26,15 +29,38 @@ public static class BuildInfo
 }
 #endregion
 
-public partial class VRCExtended : MelonMod, IMelonEvents, ICustomEvents
+// ReSharper disable once InconsistentNaming
+public class VRCExtendedPlugin : MelonPlugin
 {
-    public static readonly MelonLogger.Instance Logger = new(BuildInfo.Name, BuildInfo.MelonColor); //TODO: Remove this
-    public VRCExtended()
+    private static VRCExtendedPlugin _instance;
+    internal static MelonLogger.Instance Logger = new(BuildInfo.Name, BuildInfo.MelonColor);
+    internal new static HarmonyLib.Harmony Harmony => _instance.HarmonyInstance;
+    internal VRCExtendedPlugin()
     {
-        MelonPreferences.CreateCategory(BuildInfo.Name, $"{BuildInfo.Name} - Base");
-        Management.Manager.Init(this);
-        Logger.Msg(ConsoleColor.Green, "Successfully loaded!");
+        _instance = this;
+        ModulesManager.ReadyModules();
     }
+
+    public override void OnPreInitialization()
+    {
+        MelonModDetour.InjectMelon();
+        (Logger = LoggerInstance).Msg(ConsoleColor.Green, "Successfully loaded!");
+    }
+
+    public override void OnApplicationLateStart()
+    {
+        CustomEvents.Init();
+        ClassInjector.RegisterTypeInIl2Cpp<EnableDisableListener>();
+    }
+    
+    public override void OnApplicationQuit() =>
+        Settings.SaveConfig();
+}
+
+// ReSharper disable once InconsistentNaming
+public partial class VRCExtendedMod : MelonMod, IMelonEvents, ICustomEvents
+{
+    public VRCExtendedMod() => ModulesManager.LoadModules();
     
     #region Melon Events
     public override void OnPreSupportModule() => PreSupportModule?.Invoke();
