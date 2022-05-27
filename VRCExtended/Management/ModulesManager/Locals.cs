@@ -23,16 +23,16 @@ internal static partial class ModulesManager
             // Checks first if assembly already is on GAC.
             var assembly = AsmManager.GetIfExists(AppDomain.CurrentDomain, path);
             
-            ModuleEntry entry;
+            Entry entry;
             (string Name, Version Version) assemblyInfo;
             if (assembly != null)
             {
                 var asmName = assembly.GetName();
                 assemblyInfo = (asmName.Name, asmName.Version);
                 
-                entry = new ModuleEntry
+                entry = new Entry
                 {
-                    Type = ModuleType.Gac,
+                    Type = EntryType.Gac,
                     Assembly = assembly,
                     Version = assemblyInfo.Version
                 };
@@ -42,9 +42,9 @@ internal static partial class ModulesManager
                 if (!AsmManager.Instance.TryGetInfo(path, out assemblyInfo))
                     continue;
                 
-                entry = new ModuleEntry
+                entry = new Entry
                 {
-                    Type = ModuleType.Local,
+                    Type = EntryType.Local,
                     Path = path,
                     Version = assemblyInfo.Version
                 };

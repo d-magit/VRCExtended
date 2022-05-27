@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using VRCExtended.Base;
+using MelonLoader;
 
 namespace VRCExtended.Management;
 
 internal static partial class ModulesManager
 {
-    private static readonly List<ModuleEntry> ToLoadEntries = new();
+    private static readonly List<Entry> ToLoadEntries = new();
     
     private static void SelectAndReady()
     {
@@ -21,7 +21,7 @@ internal static partial class ModulesManager
 
             if (!TryGetBestPossibleEntry(groupedByVersions, out var entry))
             {
-                VRCExtendedPlugin.Logger.Warning($"Failed to load {m.Key} from all resources. This module won't load.");
+                Main.Logger.Warning($"Failed to load {m.Key} from all resources. This module won't load.");
                 continue;
             }
             
@@ -29,7 +29,7 @@ internal static partial class ModulesManager
         }
     }
     
-    private static bool TryGetBestPossibleEntry(IEnumerable<IOrderedEnumerable<ModuleEntry>> versionsEnum, out ModuleEntry result)
+    private static bool TryGetBestPossibleEntry(IEnumerable<IOrderedEnumerable<Entry>> versionsEnum, out Entry result)
     {
         foreach (var versions in versionsEnum)
         {
@@ -39,11 +39,11 @@ internal static partial class ModulesManager
                 {
                     entry.Assembly = entry.Type switch
                     {
-                        ModuleType.Gac => entry.Assembly,
+                        EntryType.Gac => entry.Assembly,
                         // If cachedLocals failed to unload, will try to take advantage of it.
-                        ModuleType.Local when AsmManager.Exists() => AsmManager.GetIfExists(AsmManager.CachedLocals, entry.Path) ?? Assembly.LoadFrom(entry.Path),
-                        ModuleType.Local when !AsmManager.Exists() => Assembly.LoadFrom(entry.Path),
-                        ModuleType.Remote => GetRemoteAssembly(entry),
+                        EntryType.Local when AsmManager.Exists() => AsmManager.GetIfExists(AsmManager.CachedLocals, entry.Path) ?? Assembly.LoadFrom(entry.Path),
+                        EntryType.Local when !AsmManager.Exists() => Assembly.LoadFrom(entry.Path),
+                        EntryType.Remote => GetRemoteAssembly(entry),
                         _ => null
                     };
                 } catch { /* ignored */ }
@@ -60,37 +60,40 @@ internal static partial class ModulesManager
     
     private static void LoadModule(Assembly moduleAsm)
     {
-        if (!TryGetInheritedType(moduleAsm, typeof(VrcMod), out var moduleType))
+        Type melonType = null;
+        if (!Utils.Utilities.TryGetAssemblyAttribute<MelonInfoAttribute>(moduleAsm, out var infoAttr) && 
+            !TryGetInheritedType(moduleAsm, typeof(MelonBase), out melonType))
         {
-            VRCExtendedPlugin.Logger.Warning($"Failed to load assembly {moduleAsm.GetName().FullName}: No ModuleBase inherited class found.");
+            Main.Logger.Warning($"Failed to load assembly {moduleAsm.GetName().FullName}: No MelonBase inherited class found.");
             return;
         }
+        melonType ??= infoAttr.SystemType;
 
-        VrcMod instance;
+        MelonBase instance;
         try
         {
-            instance = (VrcMod)Activator.CreateInstance(moduleType);
+            instance = (MelonBase)Activator.CreateInstance(melonType);
             if (instance == null)
                 throw new NullReferenceException();
         }
         catch
         {
-            VRCExtendedPlugin.Logger.Warning($"Failed to load ModuleBase {moduleType.FullName}: Failed to create module instance.");
+            Main.Logger.Warning($"Failed to load MelonBase {melonType.FullName}: Failed to create module instance.");
             return;
         }
         
-        CacheModule(moduleType, instance);
+        CacheModule(melonType, instance);
     }
     
-    private static bool TryGetInheritedType(Assembly module, Type baseType, out Type type)
+    private static bool TryGetInheritedType(Assembly asm, Type baseType, out Type type)
     {
         type = null;
         
-        if (module == null)
+        if (asm == null)
             return false;
     
         IEnumerable<Type> types;
-        try { types = module.GetTypes(); }
+        try { types = asm.GetTypes(); }
         catch (ReflectionTypeLoadException e) { types = e.Types.Where(t => t != null); }
         catch { return false; }
     

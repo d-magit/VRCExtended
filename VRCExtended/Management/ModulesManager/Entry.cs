@@ -5,16 +5,16 @@ using VRCExtended.Utils;
 
 namespace VRCExtended.Management;
 
-public enum ModuleType
+public enum EntryType
 {
     Gac,
     Local,
     Remote
 }
 
-public class ModuleEntry
+public class Entry
 {
-    public ModuleType Type { get; set; }
+    public EntryType Type { get; set; }
     public string Path { get; set; }
     public Assembly Assembly { get; set; }
     public Version Version { get; set; }

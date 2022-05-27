@@ -4,15 +4,15 @@ namespace VRCExtended;
 
 public class Config
 {
-    public List<ModuleConfigEntry> Modules { get; set; } = new()
+    public List<ConfigEntry> Modules { get; set; } = new()
     {
-        new ModuleConfigEntry
+        new ConfigEntry
         {
             Name = "Example Self-provided Module",
             AssemblyName = "ExampleSelfProvidedModule",
             Uri = "https://api.example.com/api/v1/VRCModules/ExampleSelfProvidedModule.dll"
         },
-        new ModuleConfigEntry
+        new ConfigEntry
         {
             Provider = "ExampleProvider",
             Name = "Example Module",
@@ -26,7 +26,7 @@ public class Config
     };
 }
 
-public class ModuleConfigEntry
+public class ConfigEntry
 {
     public string Provider { get; set; } // If null, it's a self-provided module.
     public string Name { get; set; } // Only here for reference, isn't really necessary.

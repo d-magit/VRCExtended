@@ -33,12 +33,12 @@ internal static class Settings
             try
             { @return = JsonConvert.DeserializeObject<Config>(File.ReadAllText(_configPath)); }
             catch
-            { VRCExtendedPlugin.Logger.Warning($"Failed to load config from {_configPath}, loading defaults."); }
+            { Main.Logger.Warning($"Failed to load config from {_configPath}, loading defaults."); }
             return @return ?? new Config();
         }
 
         // If config didn't exist, it will save default values to file.
-        VRCExtendedPlugin.Logger.Warning($"No config was found. Loading defaults and creating a new one at {_configPath}.");
+        Main.Logger.Warning($"No config was found. Loading defaults and creating a new one at {_configPath}.");
         SaveConfig(@return);
         
         return @return;
@@ -57,7 +57,7 @@ internal static class Settings
         catch (Exception e)
         {
             if (logError)
-                VRCExtendedPlugin.Logger.Error($"Failed to save config to {_configPath}: {e}");
+                Main.Logger.Error($"Failed to save config to {_configPath}: {e}");
         }
     }
 }

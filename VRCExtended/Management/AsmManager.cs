@@ -33,7 +33,7 @@ internal class AsmManager : MarshalByRefObject
             CachedLocals = null;
             if (_cachedLocals != null)
             {
-                VRCExtendedPlugin.Logger.Warning("Failed to remove AsmManagement.");
+                Main.Logger.Warning("Failed to remove AsmManagement.");
                 return;
             }
             
@@ -57,7 +57,7 @@ internal class AsmManager : MarshalByRefObject
             }
             catch (Exception e)
             {
-                VRCExtendedPlugin.Logger.Warning($"Failed to unload CachedLocals domain. Error: {e}");
+                Main.Logger.Warning($"Failed to unload CachedLocals domain. Error: {e}");
             }
         }
     }
@@ -83,7 +83,7 @@ internal class AsmManager : MarshalByRefObject
         }
         catch
         {
-            VRCExtendedPlugin.Logger.Warning($"Failed to get info for assembly in {path}.");
+            Main.Logger.Warning($"Failed to get info for assembly in {path}.");
             return false;
         }
     }

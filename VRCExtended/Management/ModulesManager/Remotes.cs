@@ -24,11 +24,11 @@ internal static partial class ModulesManager
         providers.ForEach(GetFromRemoteProvider);
     }
 
-    private static void GetFromRemoteProvider(IGrouping<string, ModuleConfigEntry> provider)
+    private static void GetFromRemoteProvider(IGrouping<string, ConfigEntry> provider)
     {
         if (!Settings.Instance.Providers.TryGetValue(provider.Key, out var providerAddress))
         {
-            VRCExtendedPlugin.Logger.Warning($"Failed to get all modules from provider {provider.Key}: Provider not found.");
+            Main.Logger.Warning($"Failed to get all modules from provider {provider.Key}: Provider not found.");
             return;
         }
 
@@ -37,14 +37,14 @@ internal static partial class ModulesManager
         { providerUri = new Uri(providerAddress); }
         catch
         {
-            VRCExtendedPlugin.Logger.Warning($"Failed to get all modules from provider {provider.Key}: Provided URI is invalid.");
+            Main.Logger.Warning($"Failed to get all modules from provider {provider.Key}: Provided URI is invalid.");
             return;
         }
         
         var moduleNames = provider.Select(m => m.AssemblyName).ToArray();
         var versions = GetRemoteVersions(providerUri, moduleNames);
         if (versions == null)
-            VRCExtendedPlugin.Logger.Warning($"Failed to get all modules from provider {provider.Key}: Failed to get versions.");
+            Main.Logger.Warning($"Failed to get all modules from provider {provider.Key}: Failed to get versions.");
         else
         { // TODO: Debug here
             foreach (var module in moduleNames)
@@ -52,9 +52,9 @@ internal static partial class ModulesManager
                 if (!versions.TryGetValue(module, out var version))
                     continue;
 
-                var moduleEntry = new ModuleEntry
+                var moduleEntry = new Entry
                 {
-                    Type = ModuleType.Remote,
+                    Type = EntryType.Remote,
                     Path = new Uri(providerUri, $"{module}.dll").ToString(),
                     Version = version
                 };
@@ -74,7 +74,7 @@ internal static partial class ModulesManager
         { return null; }
     }
     
-    private static Assembly GetRemoteAssembly(ModuleEntry entry)
+    private static Assembly GetRemoteAssembly(Entry entry)
     {
         byte[] bytes = null;
         try
